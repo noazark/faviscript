@@ -16,7 +16,7 @@ $(function () {
 	]
 
 	sizes.forEach(function (size) {
-		var $canvas = $('<canvas />', size).attr('id', 'icon-' + size.width).attr(size)
+		var $canvas = $('<canvas />').attr('id', 'icon-' + size.width).attr(size)
 		var context = $canvas[0].getContext("2d")
 
 		if (window.devicePixelRatio) {
@@ -24,16 +24,21 @@ $(function () {
 			var height = $canvas.attr('height')
 
 			$canvas.attr({
-				width: width * window.devicePixelRatio,
-				height: height * window.devicePixelRatio,
+				width: width,
+				height: height,
+			})
+
+			$canvas.css({
+				width: width / window.devicePixelRatio,
+				height: height / window.devicePixelRatio,
 			})
 
 			context.scale(window.devicePixelRatio, window.devicePixelRatio)
-			context.width = width
-			context.height = height
+			context.width = width / window.devicePixelRatio
+			context.height = height / window.devicePixelRatio
 
 			// select the correct context for the device's favicon
-			if (context.width / window.devicePixelRatio === 16) {
+			if (context.width === 16) {
 				favicon = context
 			}
 		}
