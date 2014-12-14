@@ -1,0 +1,12 @@
+#gallery {
+	text-align: center;
+}
+
+#gallery canvas {
+	padding: 5px;
+	vertical-align: middle;
+}
+
+#code {
+	min-height: 200px;
+}

@@ -1,4 +1,4 @@
-/* global $, jailed, window */
+/* global $, ace, window */
 $(function () {
 	var contexts = []
 	var favicon
@@ -16,7 +16,10 @@ $(function () {
 	]
 
 	sizes.forEach(function (size) {
-		var $canvas = $('<canvas />').attr('id', 'icon-' + size.width).attr(size)
+		var $canvas = $('<canvas />')
+			.attr('id', 'icon-' + size.width)
+			.attr('title', '' + size.width + ' x ' + size.height)
+			.attr(size)
 		var context = $canvas[0].getContext("2d")
 
 		if (window.devicePixelRatio) {
@@ -38,7 +41,7 @@ $(function () {
 			context.height = height / window.devicePixelRatio
 
 			// select the correct context for the device's favicon
-			if (context.width === 16) {
+			if (context.width / window.devicePixelRatio === 16) {
 				favicon = context
 			}
 		}
@@ -49,11 +52,21 @@ $(function () {
 	})
 
 	$('#runner').click(draw)
+	$('#saver').click(save)
+	$('input[name="background"]').change(setBackground)
 
+	var editor = ace.edit("code")
 	draw()
+	setBackground.call($('input[name="background"]'))
+
+
+	function setBackground() {
+		var color = $(this).val()
+		$('body').css('background-color', color)
+	}
 
 	function draw() {
-		var fn = new Function($('#coder').val())
+		var fn = new Function(editor.getValue())
 		contexts.forEach(function (ctx) {
 			ctx.clearRect(0, 0, ctx.width, ctx.height)
 			fn.call(ctx)
@@ -64,5 +77,12 @@ $(function () {
 	function updateIcon() {
 		$('link[rel="shortcut icon"]')
 			.attr('href', favicon.canvas.toDataURL('image/png'));
+	}
+
+	function save() {
+		window.open(contexts[0].canvas.toDataURL('image/png'), '_blank')
+		// contexts.forEach(function (ctx) {
+		// 	// contexts[].canvas.toDataURL('image/png')
+		// })
 	}
 })
