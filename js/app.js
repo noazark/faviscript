@@ -1,131 +1,184 @@
-/* global $, ace, ColorPicker, window */
+/* global $, ace, ColorPicker, Vue, window */
 $(function () {
-	var App = function (gallery, sizes) {
-		this.canvases = []
-		this.contexts = []
-		this.editor = undefined
-		this.favicon = []
-		this.gallery = gallery
-		this.sizes = sizes
-		this.scale = window.devicePixelRatio
-
-		this._initializeCanvases()
-		this._initializeEditor()
-		this._initializePicker()
-	}
-
-	App.prototype._initializeCanvases = function () {
-		this.sizes.forEach(function (size) {
-			var $canvas = $('<canvas />')
-				.attr('id', 'icon-' + size.width)
-				.attr('title', '' + size.width + ' x ' + size.height)
-				.attr(size)
-			var context = $canvas[0].getContext("2d")
-
-			if (this.scale) {
-				var width = $canvas.attr('width')
-				var height = $canvas.attr('height')
-
-				$canvas.attr({
-					width: width,
-					height: height,
-				})
-
-				$canvas.css({
-					width: width / this.scale,
-					height: height / this.scale,
-				})
-
-				context.scale(this.scale, this.scale)
-				context.width = width / this.scale
-				context.height = height / this.scale
-
-				// select the correct context for the device's favicon
-				if (context.width === 16) {
-					this.favicon = context
-				}
+	var FaviColorPicker = Vue.extend({
+		template: '#color-picker',
+		data: function () {
+			return {
+				label: 'background',
+				color: '#efefef'
 			}
+		},
+		ready: function () {
+			this.slider = $('.slider', this.$el)[0]
+			this.picker = $('.picker', this.$el)[0]
 
-			this.canvases.push($canvas[0])
-			this.contexts.push(context)
-		}.bind(this))
-	}
+			$('#picker').on('dragstart', function(event) {
+				event.preventDefault()
+			})
 
-	App.prototype._initializePicker = function () {
-		$('#picker').on('dragstart', function(event) {
-			event.preventDefault()
-		})
+			var picker = ColorPicker(this.slider, this.picker, function(hex, hsv, rgb) {
+				this.color = hex
+				this.contrast = '#' + ('000000' + (('0xffffff' ^ '0x'+this.color.replace('#', '')).toString(16))).slice(-6)
+			}.bind(this))
 
-		this.picker = ColorPicker($('#picker .slider')[0], $('#picker .picker')[0], function(hex, hsv, rgb) {
-			this.setBackground(hex)
-		}.bind(this))
-
-		$('input[name="background"]').submit(function () {
-			this.setBackground($('input[name="background"]').val())
-		}.bind(this))
-	}
-
-	App.prototype._initializeEditor = function () {
-		this.editor = ace.edit('code')
-		this.editor.setTheme('ace/theme/chrome')
-		this.editor.getSession().setMode('ace/mode/javascript')
-	}
-
-	App.prototype.draw = function () {
-		var fn = new Function(this.editor.getValue())
-		this.contexts.forEach(function (ctx) {
-			ctx.clearRect(0, 0, ctx.width, ctx.height)
-			try {
-				fn.call(ctx)
-			} catch (e) {
-				// do nothing
-			}
-		})
-	}
-
-	App.prototype.setBackground = function (hex) {
-		var color = hex.replace('#', '')
-		var complement = ('000000' + (('0xffffff' ^ '0x'+color).toString(16))).slice(-6)
-		$('input[name="background"]').val(hex)
-		$('#top')
-			.css('background-color', hex)
-			.css('color', complement)
-	}
-
-	var sizes = [
-		{width: 512, height: 512},
-		{width: 256, height: 256},
-		{width: 192, height: 192},
-		{width: 144, height: 144},
-		{width: 128, height: 128},
-		{width: 90, height: 90},
-		{width: 64, height: 64},
-		{width: 48, height: 48},
-		{width: 32, height: 32},
-		{width: 16, height: 16},
-	]
-
-	var app = new App('#gallery', sizes)
-	app.canvases.forEach(function (canvas) {
-		$(this.gallery).append(canvas)
+			this.$watch('color', function (val) {
+				picker.setHex(val)
+			})
+		},
 	})
 
-	$('#runner').click(draw)
-	$('#saver').click(save)
+	var Editor = Vue.extend({
+		template: '#editor',
+		data: function () {
+			return {
+				code: '// foo bar'
+			}
+		},
+		ready: function () {
+			this.editor = ace.edit($('.editor', this.$el)[0])
+			this.editor.setTheme('ace/theme/chrome')
+			this.editor.getSession().setMode('ace/mode/javascript')
 
-	draw()
+			this.editor.on('change', function (e) {
+				this.code = this.editor.getValue()
+			}.bind(this))
 
-	function draw() {
-		app.draw()
-		updateFavicon()
-	}
+			this.editor.commands.addCommand({
+				name: "replace",
+				bindKey: {win: "Ctrl-Enter", mac: "Command-Enter"},
+				exec: function(editor) {
+					this.$emit('run')
+				}.bind(this)
+			})
+		},
+		methods: {
+			getCode: function () {
+				return this.editor.getValue()
+			}
+		}
+	})
 
-	function updateFavicon() {
-		$('link[rel="shortcut icon"]')
-			.attr('href', app.favicon.canvas.toDataURL('image/png'));
-	}
-	//
-	function save() {
-		window.open(contexts[0].canvas.toDataURL('image/png'), '_blank')
-	}
+	var CodeGallery = Vue.extend({
+		template: '#gallery',
+		data: function () {
+			return {
+				code: '',
+				images: [],
+				contexts: [],
+				sizes: [
+					{width: 512, height: 512},
+				],
+				scale: window.devicePixelRatio
+			}
+		},
+		ready: function () {
+			this.sizes.forEach(function (size) {
+				var $canvas = $('<canvas />')
+					.attr('id', 'icon-' + size.width)
+					.attr('title', '' + size.width + ' x ' + size.height)
+					.attr(size)
+				var context = $canvas[0].getContext("2d")
+
+				if (this.scale) {
+					var width = $canvas.attr('width')
+					var height = $canvas.attr('height')
+
+					$canvas.attr({
+						width: width,
+						height: height,
+					})
+
+					$canvas.css({
+						width: width / this.scale,
+						height: height / this.scale,
+					})
+
+					context.scale(this.scale, this.scale)
+					context.width = width / this.scale
+					context.height = height / this.scale
+
+					// select the correct context for the device's favicon
+					if (context.width === 16) {
+						this.favicon = context
+					}
+				}
+
+				this.images.push($canvas[0])
+				this.contexts.push(context)
+			}.bind(this))
+
+			this.images.forEach(function (image) {
+				$($('.gal', this.$el)).append(image)
+			}.bind(this))
+		},
+		methods: {
+			render: function () {
+				var fn = new Function('width', 'height', this.code)
+				this.contexts.forEach(function (ctx) {
+					ctx.clearRect(0, 0, ctx.width, ctx.height)
+					try {
+						fn.call(ctx, ctx.width, ctx.height)
+					} catch (e) {
+						// do nothing, should probably alert user or something
+					}
+				})
+
+				$('link[rel="shortcut icon"]')
+					.attr('href', this.favicon.canvas.toDataURL('image/x-icon'));
+			}
+		}
+	})
+
+	var App = Vue.extend({
+		data: function () {
+			return {
+				code: '// example\nvar context = this;\nvar centerX = width / 2;\nvar centerY = height / 2;\nvar pad = Math.round(width * 0.10);\nvar radius = (width - pad * 2) / 2;\n\nfunction arc(scale, color) {\n\tcontext.beginPath();\n\tcontext.arc(centerX, centerY, radius, 0, scale * Math.PI, false);\n\tcontext.fillStyle = color;\n\tcontext.fill();\n\tcontext.closePath();\n}\n\narc(4/3, \'#59f\');',
+				background: '#ffffff',
+				foreground: '#454545',
+				sizes: [
+					{width: 512, height: 512},
+					{width: 256, height: 256},
+					{width: 192, height: 192},
+					{width: 144, height: 144},
+					{width: 128, height: 128},
+					{width: 90, height: 90},
+					{width: 64, height: 64},
+					{width: 48, height: 48},
+					{width: 32, height: 32},
+					{width: 16, height: 16},
+				],
+			}
+		},
+		ready: function () {
+			this.$.editor.$on('run', function () {
+				this.render()
+			}.bind(this))
+
+			this.$.editor.$watch('code', function (val) {
+				this.code = val
+			}.bind(this))
+
+			this.$.colorPicker.$watch('color', function (val) {
+				this.background = val
+			}.bind(this))
+
+			this.$.colorPicker.$watch('contrast', function (val) {
+				this.foreground = val
+			}.bind(this))
+
+			this.render()
+		},
+		methods: {
+			render: function () {
+				this.$.gallery.render()
+			}
+		}
+	})
+
+	Vue.component('favi-color-picker', FaviColorPicker)
+	Vue.component('favi-editor', Editor)
+	Vue.component('favi-gallery', CodeGallery)
+
+
+	window.app = new App({el: '#app'})
 })

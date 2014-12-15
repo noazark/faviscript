@@ -7,6 +7,7 @@
 		<link rel="stylesheet" href="/css/skeleton.css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="/css/app.css" media="screen" charset="utf-8">
 		<script src="/js/jquery.js"></script>
+		<script src="/js/vue.js"></script>
 		<script src="/js/editor/ace.js"></script>
 		<script src="/js/editor/mode-javascript.js"></script>
 		<script src="/js/editor/theme-chrome.js"></script>
@@ -14,58 +15,91 @@
 		<script src="/js/app.js"></script>
 	</head>
 	<body>
-		<section id="top">
-			<div class="container">
-				<div class="row">
-					<h1>FaviScript <small>by Noah H. Smith</small></h1>
-					<div id="gallery" class="twelve columns"></div>
+		<div id="app">
+			<div id="top" v-style="background-color:background">
+				<div class="container">
+					<h1 v-style="color:foreground">
+						FaviScript
+						<small>by Noah H. Smith</small>
+					</h1>
+					<favi-gallery id="gallery" class="twelve columns" v-ref="gallery" v-with="code:code, sizes:sizes"></favi-gallery>
 				</div>
 			</div>
-		</section>
-
-		<section id="bottom">
 			<div class="container">
 				<div class="row">
 					<div class="three columns">
-						<label for="background">page background:</label>
-						<input class="u-full-width" type="text" name="background" value="#efefef">
-						<div id="picker">
-							<div class="picker"></div>
-							<div class="slider"></div>
-						</div>
+						<favi-color-picker id="picker" v-with="color:background, contrast:foreground" v-ref="colorPicker"></favi-color-picker>
 					</div>
 					<div class="nine columns">
-						<div id="code" class="editor u-full-width">var context = this;
-var w = context.width;
-var h = context.height;
-var centerX = w / 2;
-var centerY = h / 2;
-var pad = Math.round(w * 0.10);
-var radius = (w - pad * 2) / 2;
-
-function arc(scale, color) {
-	context.beginPath();
-	context.arc(centerX, centerY, radius, 0, scale * Math.PI, false);
-	context.fillStyle = color;
-	context.fill();
-	context.closePath();
-}
-
-arc(4/3, '#59f');</div>
-						<button id="runner" name="run">run</button>
-						<button id="saver" name="save">save</button>
+						<div class="u-full-width" v-component="favi-editor" v-with="code:code" v-ref="editor"></div>
+						<button class="run" v-on="click: render">run</button>
 					</div>
 				</div>
 
 				<hr>
 
 				<div class="row">
-					<h3>About</h3>
-					<p>
-						More or less, this is the tool I've always wanted. I hate the process of creating icons for my small weekend projects, and yet, they look so naked without them. Even with a number of image editors at my disposal the whole process annoys me. So, FaviScript was created so I can make my own icons procedurally and never be without an favicon again.
-					</p>
+					<article class="ten columns">
+						<h3>How to Use FaviScript</h3>
+						<p>
+							Above you get an editor, a gallery and a background color selector. The code you write in the editor is run for a <code>&lt;canvas&gt;</code> of each of the sizes listed. Your code is wrapped in a function that is bound to a <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D">2d canvas context</a> and accepts two arguments, the canvas' height and width. Here is an example of what it does:
+							<pre><code>var canvas = document.getElementById('#my-canvas');
+var context = canvas.getContext('2d');
+
+function yourCode(width, height) {
+    // do some pixel pushing here
+    // this === context
+    // width === 123
+    // height === 456
+}.bind(context);
+
+yourCode(123, 456);</code></pre>
+						</p>
+						<p>
+							The gallery is where each of your icons are previewed. Once your code is run, all of the canvases are updated instantly. You'll also notice the site's favicon is updated as well.
+						</p>
+						<p>
+							The background color selector simply changes gallery background color. It does not actually change the background color of your icon! Choose a good color to design your icon on top of and you're ready to go. And just to be clear (hahaha), your icon's background is transparent unless you set it yourself in the code. The background color you choose in the color picker is just aesthetic.
+						</p>
+						<h3>About</h3>
+						<p>
+							More or less, this is the tool I've always wanted. I hate the process of creating icons for my small weekend projects, and yet, they look so naked without them. Even with a number of image editors at my disposal the whole process annoys me. So, FaviScript was created so I can make my own icons procedurally and never be without a favicon again.
+						</p>
+						<p>
+							The source code for FaviScript is open and available on <a href="https://github.com/noazark/faviscript">GitHub</a>.
+						</p>
+					</article>
+					<article class="two columns">
+						<h4>Sizes</h4>
+						<ul>
+							<li v-repeat="sizes">{{width}}×{{height}}</li>
+						</ul>
+					</article>
 				</div>
 			</div>
-		</section>
+			<footer class="container">
+				<p>
+					Created by Noah H. Smith, with the grace of his family
+				</p>
+			</footer>
+		</div>
+
+
+		<script id="color-picker" type="x-template" charset="utf-8">
+			<label for="color">{{label}}:</label>
+			<input class="color-input u-full-width" type="text" name="color" v-model="color">
+			<div class="picker"></div>
+			<div class="slider"></div>
+		</script>
+
+		<script id="editor" type="x-template" charset="utf-8">
+			<div class="editor">{{code}}</div>
+		</script>
+
+		<script id="gallery" type="x-template" charset="utf-8">
+			<div class="gal">
+
+			</div>
+		</script>
 	</body>
 </html>

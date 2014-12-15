@@ -2,8 +2,13 @@ body {
 	background-color: #efefef;
 }
 
+#top {
+	margin-bottom: 2rem;
+}
+
 #gallery {
 	text-align: center;
+	margin-bottom: 4rem;
 }
 
 #gallery canvas {
@@ -11,7 +16,7 @@ body {
 	vertical-align: middle;
 }
 
-#code {
+.editor {
 	min-height: 300px;
 }
 
@@ -19,7 +24,7 @@ body {
 	padding: 1em 0;
 }
 
-input[name="background"] {
+#picker .color-input {
 	margin-bottom: 0;
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
