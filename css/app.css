@@ -1,3 +1,7 @@
+body {
+	background-color: #efefef;
+}
+
 #gallery {
 	text-align: center;
 }
@@ -8,5 +12,35 @@
 }
 
 #code {
-	min-height: 200px;
+	min-height: 300px;
+}
+
+#bottom {
+	padding: 1em 0;
+}
+
+input[name="background"] {
+	margin-bottom: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+#picker .picker {
+	width: 90%;
+	float:left;
+	height: 200px;
+	border: 1px solid #D1D1D1;
+	border-right: none;
+	border-top: none;
+	box-sizing: border-box;
+}
+
+#picker .slider {
+	width: 10%;
+	float:left;
+	height: 200px;
+	border: 1px solid #D1D1D1;
+	border-left: none;
+	border-top: none;
+	box-sizing: border-box;
 }

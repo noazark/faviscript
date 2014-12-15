@@ -1,42 +1,71 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-		<title>Favicon</title>
+		<title>FaviScript</title>
 		<link rel="shortcut icon" media="screen">
 		<link rel="stylesheet" href="/css/normalize.css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="/css/skeleton.css" media="screen" charset="utf-8">
 		<link rel="stylesheet" href="/css/app.css" media="screen" charset="utf-8">
 		<script src="/js/jquery.js"></script>
-		<script src="/js/ace.js"></script>
+		<script src="/js/editor/ace.js"></script>
+		<script src="/js/editor/mode-javascript.js"></script>
+		<script src="/js/editor/theme-chrome.js"></script>
+		<script src="/js/picker.js"></script>
 		<script src="/js/app.js"></script>
 	</head>
 	<body>
-		<div class="container">
-			<div class="row">
-				<div id="gallery" class="twelve columns"></div>
+		<section id="top">
+			<div class="container">
+				<div class="row">
+					<h1>FaviScript <small>by Noah H. Smith</small></h1>
+					<div id="gallery" class="twelve columns"></div>
+				</div>
 			</div>
-			<div class="row">
-				<label for="background">background color:</label>
-				<input type="text" name="background" value="#efefef">
-				<div id="code" class="editor u-full-width">var context = this
-var w = context.width
-var h = context.height
-var centerX = w / 2
-var centerY = h / 2
-var pad = Math.round(w * 0.10)
+		</section>
+
+		<section id="bottom">
+			<div class="container">
+				<div class="row">
+					<div class="three columns">
+						<label for="background">page background:</label>
+						<input class="u-full-width" type="text" name="background" value="#efefef">
+						<div id="picker">
+							<div class="picker"></div>
+							<div class="slider"></div>
+						</div>
+					</div>
+					<div class="nine columns">
+						<div id="code" class="editor u-full-width">var context = this;
+var w = context.width;
+var h = context.height;
+var centerX = w / 2;
+var centerY = h / 2;
+var pad = Math.round(w * 0.10);
+var radius = (w - pad * 2) / 2;
 
 function arc(scale, color) {
-	context.beginPath()
-	context.arc(centerX, centerY, (w-pad*2)/2, 0, scale * Math.PI, false);
-	context.fillStyle = color
-	context.fill()
-	context.closePath()
+	context.beginPath();
+	context.arc(centerX, centerY, radius, 0, scale * Math.PI, false);
+	context.fillStyle = color;
+	context.fill();
+	context.closePath();
 }
 
-arc(4/3, '#59f')</div>
-				<button id="runner" name="run">run</button>
-				<button id="saver" name="save">save</button>
+arc(4/3, '#59f');</div>
+						<button id="runner" name="run">run</button>
+						<button id="saver" name="save">save</button>
+					</div>
+				</div>
+
+				<hr>
+
+				<div class="row">
+					<h3>About</h3>
+					<p>
+						More or less, this is the tool I've always wanted. I hate the process of creating icons for my small weekend projects, and yet, they look so naked without them. Even with a number of image editors at my disposal the whole process annoys me. So, FaviScript was created so I can make my own icons procedurally and never be without an favicon again.
+					</p>
+				</div>
 			</div>
-		</div>
+		</section>
 	</body>
 </html>

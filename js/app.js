@@ -1,7 +1,97 @@
-/* global $, ace, window */
+/* global $, ace, ColorPicker, window */
 $(function () {
-	var contexts = []
-	var favicon
+	var App = function (gallery, sizes) {
+		this.canvases = []
+		this.contexts = []
+		this.editor = undefined
+		this.favicon = []
+		this.gallery = gallery
+		this.sizes = sizes
+		this.scale = window.devicePixelRatio
+
+		this._initializeCanvases()
+		this._initializeEditor()
+		this._initializePicker()
+	}
+
+	App.prototype._initializeCanvases = function () {
+		this.sizes.forEach(function (size) {
+			var $canvas = $('<canvas />')
+				.attr('id', 'icon-' + size.width)
+				.attr('title', '' + size.width + ' x ' + size.height)
+				.attr(size)
+			var context = $canvas[0].getContext("2d")
+
+			if (this.scale) {
+				var width = $canvas.attr('width')
+				var height = $canvas.attr('height')
+
+				$canvas.attr({
+					width: width,
+					height: height,
+				})
+
+				$canvas.css({
+					width: width / this.scale,
+					height: height / this.scale,
+				})
+
+				context.scale(this.scale, this.scale)
+				context.width = width / this.scale
+				context.height = height / this.scale
+
+				// select the correct context for the device's favicon
+				if (context.width === 16) {
+					this.favicon = context
+				}
+			}
+
+			this.canvases.push($canvas[0])
+			this.contexts.push(context)
+		}.bind(this))
+	}
+
+	App.prototype._initializePicker = function () {
+		$('#picker').on('dragstart', function(event) {
+			event.preventDefault()
+		})
+
+		this.picker = ColorPicker($('#picker .slider')[0], $('#picker .picker')[0], function(hex, hsv, rgb) {
+			this.setBackground(hex)
+		}.bind(this))
+
+		$('input[name="background"]').submit(function () {
+			this.setBackground($('input[name="background"]').val())
+		}.bind(this))
+	}
+
+	App.prototype._initializeEditor = function () {
+		this.editor = ace.edit('code')
+		this.editor.setTheme('ace/theme/chrome')
+		this.editor.getSession().setMode('ace/mode/javascript')
+	}
+
+	App.prototype.draw = function () {
+		var fn = new Function(this.editor.getValue())
+		this.contexts.forEach(function (ctx) {
+			ctx.clearRect(0, 0, ctx.width, ctx.height)
+			try {
+				fn.call(ctx)
+			} catch (e) {
+				// do nothing
+			}
+		})
+	}
+
+	App.prototype.setBackground = function (hex) {
+		var color = hex.replace('#', '')
+		var complement = ('000000' + (('0xffffff' ^ '0x'+color).toString(16))).slice(-6)
+		$('input[name="background"]').val(hex)
+		$('#top')
+			.css('background-color', hex)
+			.css('color', complement)
+	}
+
 	var sizes = [
 		{width: 512, height: 512},
 		{width: 256, height: 256},
@@ -15,74 +105,27 @@ $(function () {
 		{width: 16, height: 16},
 	]
 
-	sizes.forEach(function (size) {
-		var $canvas = $('<canvas />')
-			.attr('id', 'icon-' + size.width)
-			.attr('title', '' + size.width + ' x ' + size.height)
-			.attr(size)
-		var context = $canvas[0].getContext("2d")
-
-		if (window.devicePixelRatio) {
-			var width = $canvas.attr('width')
-			var height = $canvas.attr('height')
-
-			$canvas.attr({
-				width: width,
-				height: height,
-			})
-
-			$canvas.css({
-				width: width / window.devicePixelRatio,
-				height: height / window.devicePixelRatio,
-			})
-
-			context.scale(window.devicePixelRatio, window.devicePixelRatio)
-			context.width = width / window.devicePixelRatio
-			context.height = height / window.devicePixelRatio
-
-			// select the correct context for the device's favicon
-			if (context.width / window.devicePixelRatio === 16) {
-				favicon = context
-			}
-		}
-
-
-		$('#gallery').append($canvas)
-		contexts.push(context)
+	var app = new App('#gallery', sizes)
+	app.canvases.forEach(function (canvas) {
+		$(this.gallery).append(canvas)
 	})
 
 	$('#runner').click(draw)
 	$('#saver').click(save)
-	$('input[name="background"]').change(setBackground)
 
-	var editor = ace.edit("code")
 	draw()
-	setBackground.call($('input[name="background"]'))
-
-
-	function setBackground() {
-		var color = $(this).val()
-		$('body').css('background-color', color)
-	}
 
 	function draw() {
-		var fn = new Function(editor.getValue())
-		contexts.forEach(function (ctx) {
-			ctx.clearRect(0, 0, ctx.width, ctx.height)
-			fn.call(ctx)
-		})
-		updateIcon()
+		app.draw()
+		updateFavicon()
 	}
 
-	function updateIcon() {
+	function updateFavicon() {
 		$('link[rel="shortcut icon"]')
-			.attr('href', favicon.canvas.toDataURL('image/png'));
+			.attr('href', app.favicon.canvas.toDataURL('image/png'));
 	}
-
+	//
 	function save() {
 		window.open(contexts[0].canvas.toDataURL('image/png'), '_blank')
-		// contexts.forEach(function (ctx) {
-		// 	// contexts[].canvas.toDataURL('image/png')
-		// })
 	}
 })
