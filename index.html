@@ -33,6 +33,7 @@
 					<div class="nine columns">
 						<div class="u-full-width" v-component="favi-editor" v-with="code:code" v-ref="editor"></div>
 						<button class="run" v-on="click: render">run</button>
+						<span class="explanation"><a href="#how-to">what is this?</a></span>
 					</div>
 				</div>
 
@@ -40,7 +41,7 @@
 
 				<div class="row">
 					<article class="ten columns">
-						<h3>How to Use FaviScript</h3>
+						<h3 id="how-to">How to Use FaviScript</h3>
 						<p>
 							Above you get an editor, a gallery and a background color selector. The code you write in the editor is run for a <code>&lt;canvas&gt;</code> of each of the sizes listed. Your code is wrapped in a function that is bound to a <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D">2d canvas context</a> and accepts two arguments, the canvas' height and width. Here is an example of what it does:
 							<pre><code>var canvas = document.getElementById('#my-canvas');

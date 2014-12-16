@@ -20,6 +20,11 @@ body {
 	min-height: 300px;
 }
 
+.explanation {
+	padding-left: 1rem;
+	font-style: oblique;
+}
+
 #bottom {
 	padding: 1em 0;
 }

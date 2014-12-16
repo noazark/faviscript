@@ -117,7 +117,7 @@ $(function () {
 				this.contexts.forEach(function (ctx) {
 					ctx.clearRect(0, 0, ctx.width, ctx.height)
 					try {
-						fn.call(ctx, ctx.width, ctx.height)
+						fn.call(ctx, ctx.canvas.width, ctx.canvas.height)
 					} catch (e) {
 						// do nothing, should probably alert user or something
 					}
@@ -132,7 +132,7 @@ $(function () {
 	var App = Vue.extend({
 		data: function () {
 			return {
-				code: '// example\nvar context = this;\nvar centerX = width / 2;\nvar centerY = height / 2;\nvar pad = Math.round(width * 0.10);\nvar radius = (width - pad * 2) / 2;\n\nfunction arc(scale, color) {\n\tcontext.beginPath();\n\tcontext.arc(centerX, centerY, radius, 0, scale * Math.PI, false);\n\tcontext.fillStyle = color;\n\tcontext.fill();\n\tcontext.closePath();\n}\n\narc(4/3, \'#59f\');',
+				code: '// example\nvar centerX = this.width / 2;\nvar centerY = this.height / 2;\nvar pad = Math.round(this.width * 0.10);\nvar radius = (this.width - pad * 2) / 2;\nvar innerRadius = radius;\n\nif (width >= 128) {\n    innerRadius *= 0.9;\n}\ndrawShell(this, centerX, centerY, innerRadius, 2);\nthis.fillStyle = \'#444\';\nthis.fill();\n\ndrawShell(this, centerX, centerY, radius, 1.25);\nthis.fillStyle = \'#59f\';\nthis.fill();\n\nfunction drawShell(ctx, x, y, radius, scale) {\n    ctx.beginPath();\n    ctx.arc(x, y, radius, 0, scale * Math.PI, false);\n    ctx.closePath();\n}\n',
 				background: '#ffffff',
 				foreground: '#454545',
 				sizes: [
