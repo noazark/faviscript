@@ -2,6 +2,10 @@ body {
 	background-color: #efefef;
 }
 
+h1 small {
+	font-size: 3rem;
+}
+
 #top {
 	margin-bottom: 2rem;
 }
