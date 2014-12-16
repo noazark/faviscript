@@ -132,7 +132,7 @@ $(function () {
 	var App = Vue.extend({
 		data: function () {
 			return {
-				code: '// example\nvar centerX = this.width / 2;\nvar centerY = this.height / 2;\nvar pad = Math.round(this.width * 0.10);\nvar radius = (this.width - pad * 2) / 2;\nvar innerRadius = radius;\n\nif (width >= 128) {\n    innerRadius *= 0.9;\n}\ndrawShell(this, centerX, centerY, innerRadius, 2);\nthis.fillStyle = \'#444\';\nthis.fill();\n\ndrawShell(this, centerX, centerY, radius, 1.25);\nthis.fillStyle = \'#17ACE7\';\nthis.fill();\n\nfunction drawShell(ctx, x, y, radius, scale) {\n    ctx.beginPath();\n    ctx.arc(x, y, radius, 0, scale * Math.PI, false);\n    ctx.closePath();\n}\n',
+				code: '// example\nvar centerX = this.width / 2;\nvar centerY = this.height / 2;\nvar pad = width >= 48 ? Math.round(this.width * 0.10) : 0;\nvar radius = (this.width - pad * 2) / 2;\nvar innerRadius = radius * (width >= 128 ? 0.9 : 1);\n\ndrawShell(this, centerX, centerY, innerRadius, 2);\nthis.fillStyle = \'#444\';\nthis.fill();\n\ndrawShell(this, centerX, centerY, radius, 1.25);\nthis.fillStyle = \'#17ACE7\';\nthis.fill();\n\nfunction drawShell(ctx, x, y, radius, scale) {\n    ctx.beginPath();\n    ctx.arc(x, y, radius, 0, scale * Math.PI, false);\n    ctx.closePath();\n}\n',
 				background: '#ffffff',
 				foreground: '#454545',
 				sizes: [
