@@ -137,7 +137,7 @@ p {
 /* Links
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 a {
-  color: #1EAEDB; }
+  color: #17ACE7; }
 a:hover {
   color: #0FA0CE; }
 
@@ -185,8 +185,8 @@ input[type="submit"].button-primary,
 input[type="reset"].button-primary,
 input[type="button"].button-primary {
   color: #FFF;
-  border-color: #33C3F0;
-  background-color: #33C3F0; }
+  border-color: #37BFF5;
+  background-color: #37BFF5; }
 .button.button-primary:hover,
 button.button-primary:hover,
 input[type="submit"].button-primary:hover,
@@ -197,8 +197,8 @@ button.button-primary:focus,
 input[type="submit"].button-primary:focus,
 input[type="reset"].button-primary:focus,
 input[type="button"].button-primary:focus {
-  background-color: #1EAEDB;
-  border-color: #1EAEDB;
+  background-color: #17ACE7;
+  border-color: #17ACE7;
   color: #FFF; }
 
 
@@ -239,7 +239,7 @@ input[type="password"]:focus,
 .editor:focus,
 textarea:focus,
 select:focus {
-  border: 1px solid #33C3F0;
+  border: 1px solid #37BFF5;
   outline: 0; }
 label,
 legend {
