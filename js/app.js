@@ -119,7 +119,7 @@ $(function () {
 					try {
 						fn.call(ctx, ctx.canvas.width, ctx.canvas.height)
 					} catch (e) {
-						// do nothing, should probably alert user or something
+						console.error(e)
 					}
 				})
 
