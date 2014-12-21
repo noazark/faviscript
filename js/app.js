@@ -24,6 +24,8 @@ $(function () {
 			this.$watch('color', function (val) {
 				picker.setHex(val)
 			})
+
+			picker.setHex(this.color)
 		},
 	})
 
