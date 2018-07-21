@@ -48,14 +48,13 @@
 							<pre><code>var canvas = document.getElementById('#my-canvas');
 var context = canvas.getContext('2d');
 
-function yourCode(width, height) {
-    // do some pixel pushing here
-    // this === context
-    // width === 123
-    // height === 456
-}.bind(context);
+function myFavicon(canvas, ctx) {
+	// do some pixel pushing here
+	// canvas.width === 123
+	// canvas.height === 456
+};
 
-yourCode(123, 456);</code></pre>
+myFavicon(123, 456);</code></pre>
 						</p>
 						<p>
 							The gallery is where each of your icons are previewed. Once your code is run, all of the canvases are updated instantly. You'll also notice the site's favicon is updated as well.

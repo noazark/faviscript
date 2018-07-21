@@ -95,7 +95,6 @@ $(function () {
 						height: height / this.scale,
 					})
 
-					context.scale(this.scale, this.scale)
 					context.width = width / this.scale
 					context.height = height / this.scale
 
@@ -115,11 +114,11 @@ $(function () {
 		},
 		methods: {
 			render: function () {
-				var fn = new Function('width', 'height', this.code)
+				var fn = new Function('canvas', 'ctx', this.code)
 				this.contexts.forEach(function (ctx) {
-					ctx.clearRect(0, 0, ctx.width, ctx.height)
+					ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 					try {
-						fn.call(ctx, ctx.canvas.width, ctx.canvas.height)
+						fn.call(null, ctx.canvas, ctx)
 					} catch (e) {
 						console.error(e)
 					}
@@ -134,14 +133,32 @@ $(function () {
 	var App = Vue.extend({
 		data: function () {
 			return {
-				code: '// example\nvar centerX = this.width / 2;\nvar centerY = this.height / 2;\nvar pad = width >= 48 ? Math.round(this.width * 0.10) : 0;\nvar radius = (this.width - pad * 2) / 2;\nvar innerRadius = radius * (width >= 128 ? 0.9 : 1);\n\ndrawShell(this, centerX, centerY, innerRadius, 2);\nthis.fillStyle = \'#444\';\nthis.fill();\n\ndrawShell(this, centerX, centerY, radius, 1.25);\nthis.fillStyle = \'#17ACE7\';\nthis.fill();\n\nfunction drawShell(ctx, x, y, radius, scale) {\n    ctx.beginPath();\n    ctx.arc(x, y, radius, 0, scale * Math.PI, false);\n    ctx.closePath();\n}\n',
+				code: `var width = canvas.width;
+var height = canvas.height;
+var centerX = width / 2;
+var centerY = height / 2;
+var pad = width >= 48 ? Math.round(width / 2 * 0.10) : 0;
+var radius = (width - pad * 2) / 2;
+var innerRadius = radius * (width / 2 >= 128 ? 0.9 : 1);
+
+drawShell(ctx, centerX, centerY, innerRadius, 2);
+ctx.fillStyle = '#444444';
+ctx.fill();
+
+drawShell(ctx, centerX, centerY, radius, 1.25);
+ctx.fillStyle = '#17ACE7';
+ctx.fill();
+
+function drawShell(ctx, x, y, radius, scale) {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, scale * Math.PI, false);
+  ctx.closePath();
+}`,
 				background: '#ffffff',
 				foreground: '#454545',
 				sizes: [
 					{width: 512, height: 512},
 					{width: 256, height: 256},
-					{width: 192, height: 192},
-					{width: 180, height: 180},
 					{width: 144, height: 144},
 					{width: 128, height: 128},
 					{width: 120, height: 120},
