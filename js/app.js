@@ -99,7 +99,7 @@ $(function () {
 					context.height = height / this.scale
 
 					// select the correct context for the device's favicon
-					if (context.width === 16) {
+					if (context.width === 32) {
 						this.favicon = context
 					}
 				}
