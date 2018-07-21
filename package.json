@@ -1,0 +1,19 @@
+{
+  "name": "faviscript",
+  "description": "favicons for hackers",
+  "version": "0.1.0",
+  "homepage": "https://faviscript.com/",
+  "license": "MIT",
+  "author": {
+    "name" : "Noah H. Smith",
+    "email" : "noah@batteredoats.com"
+  },
+  "main": "./index.js",
+  "bin": {
+    "faviscript": "./cli.js"
+  },
+  "repositories": "github:noazark/faviscript.git",
+  "dependencies": {
+    "canvas": "^2.0.0-alpha.12"
+  }
+}
