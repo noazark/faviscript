@@ -1,5 +1,5 @@
 {
-  "scriptPath": "./faviscript.js",
+  "scriptPath": "./examples/faviscript.js",
   "outputPath": "./dist",
   "sizes": [
     "512x512",

@@ -2,7 +2,7 @@
 
 "use strict"
 
-const faviscript = require('../')
+const faviscript = require('./')
 const path = require('path')
 
 const configPath = path.join(process.cwd(), '.faviscript.json')
